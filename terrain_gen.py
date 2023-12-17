@@ -36,17 +36,36 @@ def get_height(x, z):
 def get_index(x, y, z):
     return x + CHUNK_SIZE * z + CHUNK_AREA * y
 
+@njit
+def should_create_entrance(wx, wy, wz, elevation_threshold):
 
+    if wy < elevation_threshold:
+
+        # Use a noise function to determine randomness in entrance creation
+#        print("here")
+        entrance_noise = noise2(wx * 0.11, wz * 0.11)
+
+        # Check if the noise value and elevation meet the criteria for an entrance
+        if entrance_noise > 0.7 and wy >= max(2,get_height(wx, wz) * (2 / 5)):
+            return True
+        else:
+            return False
+
+    else:
+        return False
 @njit
 def set_voxel_id(voxels, x, y, z, wx, wy, wz, world_height):
-    voxel_id = 0
+
+    voxel_id = 1
 
     if wy < world_height - 1:
         # create caves
-        if (noise3(wx * 0.09, wy * 0.09, wz * 0.09) > 0 and
-                noise2(wx * 0.1, wz * 0.1) * 3 + 3 < wy < world_height - 10):
+        if (noise3(wx * 0.06, wy * 0.06, wz * 0.06) > 0 and
+                noise2(wx * 0.01, wz * 0.01) * 3 + 3 < wy < world_height - 2):
             voxel_id = 0
-
+        elif should_create_entrance(wx, wy, wz, world_height):
+#        elif False:
+            voxel_id = 0
         else:
             voxel_id = STONE
     else:
@@ -66,6 +85,8 @@ def set_voxel_id(voxels, x, y, z, wx, wy, wz, world_height):
 
         else:
             voxel_id = SAND
+
+#    voxel_id = GRASS
 
     # setting ID
     voxels[get_index(x, y, z)] = voxel_id

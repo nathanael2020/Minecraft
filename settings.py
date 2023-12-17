@@ -2,6 +2,7 @@ from numba import njit
 import numpy as np
 import glm
 import math
+import pygame as pg
 
 # OpenGL settings
 MAJOR_VER, MINOR_VER = 3, 3
@@ -9,7 +10,26 @@ DEPTH_SIZE = 24
 NUM_SAMPLES = 1  # antialiasing
 
 # resolution
-WIN_RES = glm.vec2(1600, 900)
+WIN_RES = glm.vec2(1000, 800)
+
+KEYS = {
+    'PITCH_UP': pg.K_s,
+    'PITCH_DOWN': pg.K_w,
+    'YAW_LEFT': pg.K_a,
+    'YAW_RIGHT': pg.K_d,
+    'ROLL_LEFT': pg.K_q,
+    'ROLL_RIGHT': pg.K_e,
+    'FORWARD': pg.K_UP,
+    'BACK': pg.K_DOWN,
+    'UP': pg.K_PERIOD,
+    'DOWN': pg.K_COMMA,
+    'STRAFE_L': pg.K_LEFT,
+    'STRAFE_R': pg.K_RIGHT,
+    'INTERACT': pg.K_f,
+    'SWITCH_MODE': pg.K_n,
+    'SET_VOXEL': pg.K_m,
+    'WEAPON_3': pg.K_3,
+}
 
 # world generation
 SEED = 16
@@ -18,14 +38,14 @@ SEED = 16
 MAX_RAY_DIST = 6
 
 # chunk
-CHUNK_SIZE = 48
+CHUNK_SIZE = 12
 H_CHUNK_SIZE = CHUNK_SIZE // 2
 CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE
 CHUNK_VOL = CHUNK_AREA * CHUNK_SIZE
 CHUNK_SPHERE_RADIUS = H_CHUNK_SIZE * math.sqrt(3)
 
 # world
-WORLD_W, WORLD_H = 20, 2
+WORLD_W, WORLD_H = 12, 9
 WORLD_D = WORLD_W
 WORLD_AREA = WORLD_W * WORLD_D
 WORLD_VOL = WORLD_AREA * WORLD_H
@@ -40,14 +60,15 @@ FOV_DEG = 50
 V_FOV = glm.radians(FOV_DEG)  # vertical FOV
 H_FOV = 2 * math.atan(math.tan(V_FOV * 0.5) * ASPECT_RATIO)  # horizontal FOV
 NEAR = 0.1
-FAR = 2000.0
+FAR = 65.0
 PITCH_MAX = glm.radians(89)
 
 # player
-PLAYER_SPEED = 0.005
-PLAYER_ROT_SPEED = 0.003
+PLAYER_SIZE = 0.25
+PLAYER_SPEED = 0.012
+PLAYER_ROT_SPEED = 0.008
 # PLAYER_POS = glm.vec3(CENTER_XZ, WORLD_H * CHUNK_SIZE, CENTER_XZ)
-PLAYER_POS = glm.vec3(CENTER_XZ, CHUNK_SIZE, CENTER_XZ)
+PLAYER_POS = glm.vec3(75, 35, 160)
 MOUSE_SENSITIVITY = 0.002
 
 # colors
@@ -70,7 +91,7 @@ GRASS_LVL = 8
 SAND_LVL = 7
 
 # tree settings
-TREE_PROBABILITY = 0.02
+TREE_PROBABILITY = 0.01
 TREE_WIDTH, TREE_HEIGHT = 4, 8
 TREE_H_WIDTH, TREE_H_HEIGHT = TREE_WIDTH // 2, TREE_HEIGHT // 2
 

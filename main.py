@@ -6,6 +6,8 @@ from shader_program import ShaderProgram
 from scene import Scene
 from player import Player
 from textures import Textures
+import random
+from datetime import datetime
 
 
 class VoxelEngine:
@@ -44,7 +46,7 @@ class VoxelEngine:
         self.shader_program.update()
         self.scene.update()
 
-        self.delta_time = self.clock.tick()
+        self.delta_time = self.clock.tick(60)
         self.time = pg.time.get_ticks() * 0.001
         pg.display.set_caption(f'{self.clock.get_fps() :.0f}')
 
@@ -60,8 +62,12 @@ class VoxelEngine:
             self.player.handle_event(event=event)
 
     def run(self):
+
         while self.is_running:
             self.handle_events()
+            # if datetime.now().second % 2 == 0 and datetime.now().microsecond < 10000:
+            #     self.scene.world.voxel_handler.change_voxel(10, 25, 10)
+#            self.scene.world.voxel_handler.update()
             self.update()
             self.render()
         pg.quit()

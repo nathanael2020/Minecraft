@@ -79,6 +79,17 @@ def get_chunk_index(world_voxel_pos):
 
 @njit
 def is_void(local_voxel_pos, world_voxel_pos, world_voxels):
+
+    # Make sure the voxels at the edges of the world are rendered
+    # This returns is_void for chunks outside the world bounds, so the faces of adjacent voxels facing out are rendered
+
+    wx, wy, wz = world_voxel_pos
+    cx = wx // CHUNK_SIZE
+    cy = wy // CHUNK_SIZE
+    cz = wz // CHUNK_SIZE
+    if not (0 <= cx < WORLD_W and 0 <= cy < WORLD_H and 0 <= cz < WORLD_D):
+        return True
+
     chunk_index = get_chunk_index(world_voxel_pos)
     if chunk_index == -1:
         return False

@@ -1,3 +1,5 @@
+import random
+
 from settings import *
 from meshes.chunk_mesh_builder import get_chunk_index
 
@@ -134,6 +136,70 @@ class VoxelHandler:
                     step_dir = 2
         return False
 
+    def grow_plant(self, plant_seed_voxel):
+        pass
+
+    def change_voxel(self, voxel_world_pos_x, voxel_world_pos_y, voxel_world_pos_z):
+
+        chunk_index = get_chunk_index((voxel_world_pos_x, voxel_world_pos_y, voxel_world_pos_z))
+        chunk = self.chunks[chunk_index]
+        chunk.voxels[chunk.voxels.size - 1] = 99
+        chunk.mesh.rebuild()
+
+        if chunk.is_empty:
+            chunk.is_empty = False
+
+        # result = self.get_voxel_id(voxel_world_pos)
+        # if result[0]:
+        #     _, voxel_index, _, chunk = result
+        #     chunk.voxels[voxel_index] = new_voxel_id
+        #     chunk.mesh.rebuild()
+        #
+        #     # was it an empty chunk
+        #     if chunk.is_empty:
+        #         chunk.is_empty = False
+
+    def add_test_voxels(self):
+
+        for y in range(100):
+
+            voxel_world_pos_x = random.randint(0, WORLD_W * CHUNK_SIZE - 2)
+            voxel_world_pos_y = random.randint(20, 20)
+            voxel_world_pos_z = random.randint(0, WORLD_H * CHUNK_SIZE - 2)
+
+            chunk_index = get_chunk_index((voxel_world_pos_x, 20, voxel_world_pos_z))
+            chunk = self.chunks[chunk_index]
+            for i in range(0, chunk.voxels.size):
+                chunk.voxels[i] = 1
+            chunk.mesh.rebuild()
+
+            if chunk.is_empty:
+                chunk.is_empty = False
+
+    #        voxel_index = random.randint(0, self.app.scene.world.voxels.size - 1)
+
+        # voxel_world_pos_x = random.randint(0, WORLD_W * CHUNK_SIZE - 2)
+        # voxel_world_pos_y = random.randint(10, WORLD_D * CHUNK_SIZE - 2)
+        # voxel_world_pos_z = random.randint(0, WORLD_H * CHUNK_SIZE - 2)
+        #
+        # voxel_world_pos = glm.ivec3(voxel_world_pos_x, voxel_world_pos_y, voxel_world_pos_z)
+
+        # voxel_world_pos = glm.ivec3(1, 1, 1)
+        #
+        # result = self.get_voxel_id(voxel_world_pos)
+        # #
+        # # # is the new place empty?
+        # # if not result[0]:
+        # _, voxel_index, _, chunk = result
+        #
+        # chunk.voxels[voxel_index] = self.new_voxel_id
+        # chunk.mesh.rebuild()
+
+        # was it an empty chunk
+        # if chunk.is_empty:
+        #      chunk.is_empty = False
+
+
     def get_voxel_id(self, voxel_world_pos):
         cx, cy, cz = chunk_pos = voxel_world_pos / CHUNK_SIZE
 
@@ -148,3 +214,34 @@ class VoxelHandler:
 
             return voxel_id, voxel_index, voxel_local_pos, chunk
         return 0, 0, 0, 0
+
+
+    def check_player_collision(self, player_position, dx=0, dy=0, dz=0):
+        # start point
+        x1, y1, z1 = self.app.player.position
+        # end point
+
+        int_pos = (
+            int(player_position.x + dx + (
+                PLAYER_SIZE if dx > 0 else -PLAYER_SIZE if dx < 0 else 0)
+                ),
+            int(player_position.y + dy + (
+                PLAYER_SIZE if dy > 0 else -PLAYER_SIZE if dy < 0 else 0)
+                ),
+            int(player_position.z + dz + (
+                PLAYER_SIZE if dz > 0 else -PLAYER_SIZE if dz < 0 else 0)
+                )
+        )
+
+        next_pos = glm.ivec3(int(player_position.x + dx + (PLAYER_SIZE if dx > 0 else -PLAYER_SIZE if dx < 0 else 0)),
+                             int(player_position.y + dy + (PLAYER_SIZE if dy > 0 else -PLAYER_SIZE if dy < 0 else 0)),
+                             int(player_position.z + dz + (PLAYER_SIZE if dz > 0 else -PLAYER_SIZE if dz < 0 else 0)))
+
+        result = self.get_voxel_id(voxel_world_pos=next_pos)
+
+        if result[0] and (0 <= next_pos[0] <= WORLD_W * CHUNK_SIZE and 0 <= next_pos[1] <= WORLD_H * CHUNK_SIZE and 0 <= next_pos[2] <= WORLD_D * CHUNK_SIZE):
+            return True
+        else:
+            return False
+
+
